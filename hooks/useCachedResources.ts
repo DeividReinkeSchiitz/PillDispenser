@@ -1,7 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
-import * as Font from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import * as React from 'react';
+import {Ionicons} from "@expo/vector-icons";
+import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import * as React from "react";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -12,13 +12,18 @@ export default function useCachedResources() {
       try {
         SplashScreen.preventAutoHideAsync();
 
-        // Load fonts
-        await Font.loadAsync({
-          ...Ionicons.font,
-          'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
-        });
+        await Promise.all([
+          Font.loadAsync({
+            // ...
+          }),
+          Font.loadAsync({
+            ...Ionicons.font,
+            "MontserratBold": require("../assets/fonts/MontserratBold.ttf"),
+            "MontserratRegular": require("../assets/fonts/MontserratRegular.ttf"),
+            "MontserratMedium": require("../assets/fonts/MontserratMedium.ttf"),
+          }),
+        ]);
       } catch (e) {
-        // We might want to provide this error information to an error reporting service
         console.warn(e);
       } finally {
         setLoadingComplete(true);

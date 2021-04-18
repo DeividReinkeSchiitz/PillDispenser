@@ -1,17 +1,7 @@
-export type RootStackParamList = {
-  Root: undefined;
-  NotFound: undefined;
-};
-
-export type BottomTabParamList = {
-  TabOne: undefined;
-  TabTwo: undefined;
-};
-
-export type TabOneParamList = {
-  TabOneScreen: undefined;
-};
-
-export type TabTwoParamList = {
-  TabTwoScreen: undefined;
-};
+export type AlarmType = {
+  time: string;
+  name: string;
+  repeted: string[] | "Uma vez" | "Diáriamente" | "Seg à Sex";
+  enabled: boolean;
+  id:string;
+}
