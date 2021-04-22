@@ -30,7 +30,6 @@ export default function App() {
 
   const changeAllAlarmsIsSelected = (value?:boolean) => {
     setAllAlarmIsSelected((state)=> value || !state);
-    console.log(allAlarmIsSelected);
   };
 
   const changeIsDeleting = (value?:boolean) =>{

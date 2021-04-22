@@ -6,7 +6,7 @@ import Pills from "../../assets/icons/Pills.svg";
 import Close from "../../assets/icons/Wrong.svg";
 import SelectAll from "../../assets/icons/SelectAll.svg";
 
-import {Animated} from "react-native";
+import Animated from "react-native-reanimated";
 import Colors from "../../constants/Colors";
 import Fonts from "../../constants/Fonts";
 

@@ -1,25 +1,22 @@
-import React, {useContext, useEffect, useRef} from "react";
-import {Animated, Easing} from "react-native";
+import React from "react";
 
 import {Container, DeleteButton, DeleteText, TrashIcon} from "./styles";
-import ContextIsDeleting from "../../context/ContextIsDeleting";
 import useTranslateY from "../../Animations/useTranslateY";
-
+import {useAnimatedStyle, withTiming, interpolate} from "react-native-reanimated";
 interface PropsI {
   deleteListOfAlarms:()=>void
 }
 
 
 const DeleteAlarms = (props:PropsI) => {
-  const translateY = useTranslateY();
+  const Y = useTranslateY();
 
-  const translateInterpolated = translateY.interpolate({
-    inputRange: [-80, 0],
-    outputRange: [0, 80],
-  });
+  const translateYAnimation = useAnimatedStyle(()=>({
+    transform: [{translateY: interpolate(Y.value, [-80, 0], [0, 80])}],
+  }));
 
   return (
-    <Container style={{transform: [{translateY: translateInterpolated}]}}>
+    <Container style={[translateYAnimation]} >
       <DeleteButton onPress={props.deleteListOfAlarms}>
         <TrashIcon/>
         <DeleteText>

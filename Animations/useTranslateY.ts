@@ -1,6 +1,7 @@
 import {useContext, useEffect, useRef} from "react";
 import {Animated, Easing} from "react-native";
 import ContextIsDeleting from "../context/ContextIsDeleting";
+import {useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
 
 const useTranslateY = () => {
   const {isDeleting} = useContext(ContextIsDeleting)!;
@@ -27,4 +28,21 @@ const useTranslateY = () => {
   return translateY;
 };
 
-export default useTranslateY;
+const useTranslateYTop = () => {
+  const {isDeleting} = useContext(ContextIsDeleting)!;
+  const Y = useSharedValue(0);
+
+
+  useEffect(()=>{
+    if (isDeleting) {
+      Y.value = withTiming(-80);
+    } else {
+      Y.value = withTiming(0);
+    }
+  }, [isDeleting]);
+
+  return Y;
+};
+
+
+export default useTranslateYTop;

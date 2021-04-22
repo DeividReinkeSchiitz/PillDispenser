@@ -20,14 +20,19 @@ import {Alert, RefreshControl, View} from "react-native";
 import ContextUid from "../../context/ContextUserUid";
 import ContextIsDeleting from "../../context/ContextIsDeleting";
 import useTranslateY from "../../Animations/useTranslateY";
+import {useAnimatedStyle, withTiming} from "react-native-reanimated";
+
+interface ParamsProps extends AlarmType{
+    stop:boolean
+}
 
 export default function Home() {
+  const Yvalue = useTranslateY();
+
   const {isDeleting, changeIsDeleting} = useContext(ContextIsDeleting)!;
   const uid = useContext(ContextUid);
-
-  const translateY = useTranslateY();
   const navigation = useNavigation();
-  const params = useRoute().params as AlarmType;
+  const route = useRoute();
 
   const [alarms, setAlarms] = useState<AlarmType[]>([]);
   const [listOfAlarmsToDelete, setListOfAlarmsToDelete] = useState<string[]>([]);
@@ -35,20 +40,20 @@ export default function Home() {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const fetchData = async () => {
-    firebase.auth().onAuthStateChanged(async (user)=>{
-      if (user) {
-        try {
-          const response = await api.post("/alarms/show", {
-            uid: user.uid,
-          });
-          setAlarms(response.data);
-          setIsLoading(false);
-          setRefreshing(false);
-        } catch (error) {
-          Alert.alert(error.message, "Houve algum erro ao tentar conexão com o servidor.");
-        }
-      }
-    });
+    try {
+      firebase.auth().onAuthStateChanged(async (user)=>{
+        if (!user) return;
+
+        const response = await api.post("/alarms/show", {
+          uid: user.uid,
+        });
+        setAlarms(response.data);
+        setIsLoading(false);
+        setRefreshing(false);
+      });
+    } catch (error) {
+      Alert.alert(error.message, "Houve algum erro ao tentar conexão com o servidor.");
+    }
   };
 
   const mountedRef = useRef(true);
@@ -62,13 +67,33 @@ export default function Home() {
   }, []);
 
   useEffect(()=>{
-    if (!params) return;
+    const params = route.params as ParamsProps;
 
-    const newAlarms = alarms;
-    alarms.push(params);
+    if (params.stop) return;
 
-    setAlarms(newAlarms);
-  }, [params]);
+    delete params?.enabled;
+
+    (async () => {
+      try {
+        setRefreshing(true);
+        setIsLoading(true);
+        await api.post("/alarms/create", {
+          name: params.name,
+          repeted: params.repeted,
+          time: params.time,
+          uid,
+        });
+        await fetchData();
+        setRefreshing(true);
+      } catch (error) {
+        Alert.alert(error.message, "Houve algum erro ao tentar conexão com o servidor.");
+      } finally {
+        setIsLoading(false);
+        setRefreshing(false);
+        navigation.setParams({stop: true});
+      };
+    })();
+  }, [route.params]);
 
   const AddButtonPressed = () => {
     navigation.navigate("AddAlarmScreen");
@@ -142,6 +167,10 @@ export default function Home() {
     await fetchData();
   }, []);
 
+  const topAnimation = useAnimatedStyle(()=>({
+    top: Yvalue.value,
+  }));
+
   if (alarms?.length == 0) {
     return (
       <NoDataContainer>
@@ -161,12 +190,13 @@ export default function Home() {
   } else {
     return (
       <View style={{flex: 1}}>
+
         <ContainerData
-          style={{
-            transform: [{
+          /* transform: [{
               translateY: translateY,
-            }],
-          }}
+            }], */
+          style={[topAnimation]}
+
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -176,6 +206,7 @@ export default function Home() {
             />
           }
         >
+
           {
             alarms?.map((alarmData, index) => (
               <View style={{
@@ -194,6 +225,7 @@ export default function Home() {
                 />
               </View>
             ))}
+
         </ContainerData>
 
         <DeleteAlarms deleteListOfAlarms={deleteListOfAlarms}/>

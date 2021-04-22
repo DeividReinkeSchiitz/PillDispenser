@@ -11,6 +11,7 @@ export default function useFirebaseUid():string {
     async function sign() {
       try {
         const result = await firebase.auth().signInWithEmailAndPassword(EMAIL, PASSWORD);
+
         setUid(result.user?.uid!);
       } catch (error) {
         console.log(error);

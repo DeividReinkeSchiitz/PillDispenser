@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {View} from "react-native";
 import {PanGestureHandler} from "react-native-gesture-handler";
 
@@ -6,14 +6,13 @@ import {Container} from "./styles";
 import MaskedView from "@react-native-community/masked-view";
 import {LinearGradient} from "expo-linear-gradient";
 
-import Animated, {useSharedValue, useAnimatedStyle, withTiming, useAnimatedGestureHandler, Easing, useDerivedValue, runOnJS, cancelAnimation} from "react-native-reanimated";
+import Animated, {useSharedValue, useAnimatedStyle, withTiming, useAnimatedGestureHandler, Easing, useDerivedValue, runOnJS, cancelAnimation, sub} from "react-native-reanimated";
 import {CONTAINER_HEIGHT, ITEM_HEIGHT} from "../constants";
 import ContextSubmited from "../../../context/ContextSubmited";
 
 
 const perspective = 850;
 const z = 50;
-
 interface PropsI {
    items: (number | string)[];
    initialIndex?:number;
@@ -26,17 +25,23 @@ function Picker(props:PropsI) {
   const count = useSharedValue(props?.initialIndex!*-1 || 0);
   const rotateX = useSharedValue(40);
   const rotateXN = useSharedValue(0);
-  const [animationFinished, setAnimationFinished] = useState(false);
   const {submited} = useContext(ContextSubmited)!;
+
+  const first = useRef(true);
+
   const config:Animated.WithTimingConfig = {
     duration: props.speed,
   };
 
+
   useEffect(()=>{
+    if (first.current) {
+      first.current = false;
+      return;
+    }
     const item = props.items[count.value*-1 +1];
     props.onValueChange(item.toString());
   }, [submited]);
-
 
   const eventHandler = useAnimatedGestureHandler({
     onFinish: (event)=>{
@@ -64,26 +69,22 @@ function Picker(props:PropsI) {
     },
   });
 
-  const animatedView = useAnimatedStyle(()=> {
-    return ({
-      transform: [{translateY: withTiming(Y.value, {
-        easing: Easing.bezier(0.34, 1.56, 0.64, 1),
-        ...config,
-      })}],
-    });
-  });
-
 
   const MaskElement = () => (
     <Animated.View style={[
-      animatedView, {width: "100%", margin: -2}]} >
+      useAnimatedStyle(()=>({
+        transform: [{translateY: withTiming(Y.value, {
+          easing: Easing.bezier(0.34, 1.56, 0.64, 1),
+          ...config,
+        })}],
+      })), {width: "100%", margin: -2}]} >
       {props.items.map((v, i)=>(
         <Animated.Text style={[
           useAnimatedStyle(()=>({
             transform: [
               {perspective},
               {scale: (Math.abs(count.value)+1 ==i)? withTiming(perspective/(perspective-z), config): withTiming(1, config)},
-              {translateX: (Math.abs(count.value)+1 ==i)? withTiming(-5, config): withTiming(0, config)},
+              {translateX: (Math.abs(count.value)+1 ==i)? withTiming(-5, {duration: 200}): withTiming(0, {duration: 200})},
               {rotateX: `${(Math.abs(count.value)+1 ==i)? rotateXN.value:rotateX.value }deg`},
             ],
           })),
@@ -127,6 +128,5 @@ function Picker(props:PropsI) {
     </View>
   );
 };
-
 
 export default Picker;

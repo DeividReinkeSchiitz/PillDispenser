@@ -97,7 +97,7 @@ function AlarmInfo(props: PropsI) {
 
             <View>
               <NameText>
-                {props.name}
+                {props.name.length > 28 ? props.name.slice(0, 26).concat("..."):props.name}
               </NameText>
 
               {

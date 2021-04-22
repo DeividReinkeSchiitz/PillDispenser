@@ -1,9 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 
 import {Container, BorderViewTop, BorderViewBottom} from "./styles";
 import Picker from "./Picker";
 import {CONTAINER_HEIGHT} from "./constants";
+import ContextSubmited from "../../context/ContextSubmited";
 
+import useStateWithPromise from "../../hooks/useStateWithPromise";
 
 const hoursItems = [
   "", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
@@ -27,40 +29,50 @@ const initialMinutesIndex = 0;
 const initialHourIndex = 4;
 
 function TimerPicker(props:TimerPickerProps) {
-  const [hour, setHour] = useState((initialHourIndex+1).toString());
-  const [minutes, setMinutes] = useState(initialMinutesIndex.toString());
-  const [period, setPeriod] = useState("AM");
+  const hours = useRef((initialHourIndex+1).toString());
+  const minutes = useRef(initialMinutesIndex.toString());
+  const period = useRef("AM");
 
-  useEffect(()=>{
+  const changedHour = (hour:string) =>{
+    hours.current = hour;
+  };
+
+  const changedMinute = async (minute:string) =>{
+    if (minute == "0") {
+      minute = "00";
+    }
+    minutes.current = minute;
+  };
+
+  const changedPeriod = (newPeriod:string) =>{
+    period.current = newPeriod;
+
+    let time = "";
+    if (newPeriod === "AM") {
+      time = `${hours.current}:${minutes.current}`;
+    } else {
+      time = (`${Number(hours.current)+12}:${minutes.current}`).toString();
+    }
+
+    props.changeTimer(time);
+  };
+
+  /*   useEffect(()=>{
     let time = "";
     if (period === "AM") {
       time = `${hour}:${minutes}`;
     } else {
       time = (`${Number(hour)+12}:${minutes}`).toString();
     }
+
     props.changeTimer(time);
-  }, [hour, minutes, period]);
-
-  const changedHour = (hour:string) =>{
-    setHour(hour);
-  };
-
-  const changedMinute = (minute:string) =>{
-    if (minute == "0") {
-      minute = "00";
-    }
-    setMinutes(minute);
-  };
-
-  const changedPeriod = (period:string) =>{
-    setPeriod(period);
-  };
+  }, [hour, minutes, period]); */
 
   return (
     <Container height={CONTAINER_HEIGHT} {...props}>
-      <Picker items={hoursItems} onValueChange={changedHour} speed={500} initialIndex={initialHourIndex}/>
-      <Picker items={minutesItems} onValueChange={changedMinute} speed={500} initialIndex={initialMinutesIndex}/>
-      <Picker items={periodsItems} onValueChange={changedPeriod} speed={500}/>
+      <Picker items={hoursItems} onValueChange={changedHour} speed={300} initialIndex={initialHourIndex}/>
+      <Picker items={minutesItems} onValueChange={changedMinute} speed={300} initialIndex={initialMinutesIndex}/>
+      <Picker items={periodsItems} onValueChange={changedPeriod} speed={300}/>
       <BorderViewTop/>
       <BorderViewBottom/>
     </Container>

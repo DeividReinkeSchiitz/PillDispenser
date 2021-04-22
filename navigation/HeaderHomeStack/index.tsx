@@ -15,13 +15,15 @@ import {Container,
   ButtonContent,
 } from "./styles";
 import ContextIsDeleting from "../../context/ContextIsDeleting";
-import {Animated, Button, Easing} from "react-native";
+import Animated, {Easing} from "react-native";
 import useTranslateY from "../../Animations/useTranslateY";
 import ContextAllAlarmIsSelected from "../../context/ContextAllAlarmIsSelected";
+import {interpolate, useAnimatedStyle} from "react-native-reanimated";
 
 
 export default function HeaderStack() {
-  const translateY = useTranslateY();
+  const Y = useTranslateY();
+
   const {isDeleting, changeIsDeleting} = useContext(ContextIsDeleting)!;
   const {changeAllAlarmsIsSelected} = useContext(ContextAllAlarmIsSelected)!;
 
@@ -54,22 +56,25 @@ export default function HeaderStack() {
 
 
   // hidden to show
-  const opacityInterpolated1 = translateY.interpolate({
-    inputRange: [-80, 0],
-    outputRange: [1, 0],
-  });
+  const opacityInterpolated1 = useAnimatedStyle(()=>({
+    opacity: interpolate(Y.value, [-80, 0], [1, 0]),
+  }));
 
   // show to hidden
-  const opacityInterpolated2 = translateY.interpolate({
-    inputRange: [-80, 0],
-    outputRange: [0, 1],
-  });
+  const opacityInterpolated2 = useAnimatedStyle(()=>({
+    opacity: interpolate(Y.value, [-80, 0], [0, 1]),
+  }));
+
+  const translateYAnimation = useAnimatedStyle(()=>({
+    transform: [{translateY: Y.value}],
+  }));
+
   return (
-    <Container style={{transform: [{translateY}]}}>
+    <Container style={[translateYAnimation]}>
       {
         !isDeleting?
         <IsNotDeletingContent
-          style={{opacity: opacityInterpolated2}}
+          style={[opacityInterpolated2]}
         >
           <Body>
             <Title > Alarmes </Title>
@@ -79,7 +84,7 @@ export default function HeaderStack() {
         </IsNotDeletingContent> :
 
         <IsDeletingContent
-          style={{opacity: opacityInterpolated1}}
+          style={[opacityInterpolated1]}
         >
           <ButtonContent
             onPress={closeIsDeleting}
@@ -101,7 +106,6 @@ export default function HeaderStack() {
           </ButtonContent>
         </IsDeletingContent>
       }
-
     </Container>
   );
 }

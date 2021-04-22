@@ -2,7 +2,7 @@ import styled from "styled-components/native";
 import Trash from "../../assets/icons/Trash.svg";
 import Colors from "../../constants/Colors";
 import Fonts from "../../constants/Fonts";
-import {Animated} from "react-native";
+import Animated from "react-native-reanimated";
 
 export const Container = styled(Animated.View)`
    position:absolute;
