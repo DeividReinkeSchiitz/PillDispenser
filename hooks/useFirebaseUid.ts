@@ -1,24 +1,21 @@
 import {useEffect, useState} from "react";
 import firebase from "../config/firebaseConfig";
 
-const EMAIL = "deividrs34@gmail.com";
-const PASSWORD = "deivid123";
+const EMAIL = "";
+const PASSWORD = "";
 
-export default function useFirebaseUid():string {
-  const [uid, setUid] = useState("");
+export default function useFirebaseUid() {
+  const [uid, setUid] = useState<string | undefined>("");
 
   useEffect(()=>{
-    async function sign() {
+    (async () => {
       try {
-        const result = await firebase.auth().signInWithEmailAndPassword(EMAIL, PASSWORD);
-
-        setUid(result.user?.uid!);
+        const sign = await firebase.auth().signInWithEmailAndPassword(EMAIL, PASSWORD);
+        setUid(sign.user?.uid);
       } catch (error) {
         console.log(error);
       }
-    }
-
-    sign();
+    })();
   }, []);
 
   return uid;

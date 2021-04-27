@@ -31,8 +31,9 @@ export const ButtonContainer = styled.View`
 
 export const TimeText = styled.Text`
    font-size: 25px;
-   font-family: ${Fonts.title};
-   margin-top: 5px; 
+   font-family: ${Fonts.subtitle};
+   margin-top: 5px;
+   color:black;
 `;
 export const RepetedText = styled.Text`
    margin: 10px;
@@ -40,8 +41,10 @@ export const RepetedText = styled.Text`
 `;
 
 export const NameText = styled.Text`
+   position:absolute;
+   top:0;
+   right:0;
    font-size:15px;
-   margin-right: 12px;
    font-family:${Fonts.subtitle};
    color:black;
    text-transform:capitalize;

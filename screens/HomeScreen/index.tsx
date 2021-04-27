@@ -21,13 +21,14 @@ import ContextUid from "../../context/ContextUserUid";
 import ContextIsDeleting from "../../context/ContextIsDeleting";
 import useTranslateY from "../../Animations/useTranslateY";
 import {useAnimatedStyle, withTiming} from "react-native-reanimated";
+import {create, remove, show} from "../../controllers/alarmControllers";
 
 interface ParamsProps extends AlarmType{
     stop:boolean
 }
 
 export default function Home() {
-  const Yvalue = useTranslateY();
+  const Yvalue = useTranslateY({duration: 270});
 
   const {isDeleting, changeIsDeleting} = useContext(ContextIsDeleting)!;
   const uid = useContext(ContextUid);
@@ -41,16 +42,10 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      firebase.auth().onAuthStateChanged(async (user)=>{
-        if (!user) return;
-
-        const response = await api.post("/alarms/show", {
-          uid: user.uid,
-        });
-        setAlarms(response.data);
-        setIsLoading(false);
-        setRefreshing(false);
-      });
+      const reponse = await show(uid) as AlarmType[];
+      setAlarms(reponse);
+      setIsLoading(false);
+      setRefreshing(false);
     } catch (error) {
       Alert.alert(error.message, "Houve algum erro ao tentar conexão com o servidor.");
     }
@@ -69,30 +64,31 @@ export default function Home() {
   useEffect(()=>{
     const params = route.params as ParamsProps;
 
-    if (params.stop) return;
+    if (params?.stop == false) {
+      delete params?.enabled;
 
-    delete params?.enabled;
+      (async () => {
+        try {
+          setRefreshing(true);
+          setIsLoading(true);
 
-    (async () => {
-      try {
-        setRefreshing(true);
-        setIsLoading(true);
-        await api.post("/alarms/create", {
-          name: params.name,
-          repeted: params.repeted,
-          time: params.time,
-          uid,
-        });
-        await fetchData();
-        setRefreshing(true);
-      } catch (error) {
-        Alert.alert(error.message, "Houve algum erro ao tentar conexão com o servidor.");
-      } finally {
-        setIsLoading(false);
-        setRefreshing(false);
-        navigation.setParams({stop: true});
-      };
-    })();
+          await create(uid, {
+            name: params.name,
+            time: params.time,
+            repeted: params.repeted,
+          });
+
+          await fetchData();
+          setRefreshing(true);
+        } catch (error) {
+          Alert.alert(error.message, "Houve algum erro ao tentar conexão com o servidor.");
+        } finally {
+          setIsLoading(false);
+          setRefreshing(false);
+          navigation.setParams({stop: true});
+        };
+      })();
+    }
   }, [route.params]);
 
   const AddButtonPressed = () => {
@@ -119,12 +115,7 @@ export default function Home() {
         setAlarms(newAlarms);
       };
 
-      api.delete("/alarms", {
-        data: {
-          uid,
-          ids: listOfAlarmsToDelete,
-        },
-      });
+      remove(uid, listOfAlarmsToDelete);
 
       setListOfAlarmsToDelete([]);
       changeIsDeleting(false);

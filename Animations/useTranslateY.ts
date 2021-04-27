@@ -28,16 +28,24 @@ const useTranslateY = () => {
   return translateY;
 };
 
-const useTranslateYTop = () => {
+interface Props {
+  duration?:number;
+}
+
+const useTranslateYTop = (props?:Props) => {
   const {isDeleting} = useContext(ContextIsDeleting)!;
   const Y = useSharedValue(0);
 
 
   useEffect(()=>{
     if (isDeleting) {
-      Y.value = withTiming(-80);
+      Y.value = withTiming(-80, {
+        duration: props?.duration || 300,
+      });
     } else {
-      Y.value = withTiming(0);
+      Y.value = withTiming(0, {
+        duration: props?.duration || 300,
+      });
     }
   }, [isDeleting]);
 

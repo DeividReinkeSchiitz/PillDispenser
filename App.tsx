@@ -19,6 +19,9 @@ import ContextIsDeleting from "./context/ContextIsDeleting";
 import ContextAllAlarmIsSelected from "./context/ContextAllAlarmIsSelected";
 import ContextSubmited from "./context/ContextSubmited";
 
+import AppLoading from "expo-app-loading";
+import * as SplashScreen from "expo-splash-screen";
+
 export default function App() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
@@ -40,11 +43,19 @@ export default function App() {
     setSubmited((state)=> value || !state);
   };
 
-  if (!isLoadingComplete) {
-    return null;
+  if (!isLoadingComplete || !uid) {
+    return (
+      <AppLoading
+        onError={console.warn}
+        autoHideSplash
+        onFinish={()=>{
+          SplashScreen.hideAsync();
+        }}
+      />
+    );
   } else {
     return (
-      <ContextUserUid.Provider value={uid} >
+      <ContextUserUid.Provider value={uid || ""} >
         <ContextIsDeleting.Provider value={{isDeleting, changeIsDeleting}}>
           <ContextAllAlarmIsSelected.Provider value={{allAlarmIsSelected, changeAllAlarmsIsSelected}}>
             <ContextSubmited.Provider value={{submited, changeSubmited}}>

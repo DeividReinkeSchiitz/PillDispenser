@@ -27,7 +27,7 @@ export const AceptIcon = styled(Correct)`
 export const Title = styled.Text`
     font-size:20px;
     color:${Colors.title};
-    font-family: ${Fonts.title};
+    font-family: ${Fonts.subtitle};
 `;
 
 

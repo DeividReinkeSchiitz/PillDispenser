@@ -102,7 +102,6 @@ function AddAlarmScreen() {
   }));
 
   const changeTimer = (h:string) => {
-    console.log(h);
     if (drugName == "") {
       setInputError(true);
       return;
@@ -128,7 +127,6 @@ function AddAlarmScreen() {
     } else {
       currentRepeted = repeted;
     }
-    console.log("aaaaakiii: " + currentRepeted);
 
     const newAlarm = {
       name: drugName,

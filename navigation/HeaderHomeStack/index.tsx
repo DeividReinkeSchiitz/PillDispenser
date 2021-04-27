@@ -42,7 +42,7 @@ export default function HeaderStack() {
       let week = mom.format("llll");
       week = week.slice(0, week.indexOf(",") + 2);
       setTime(week + hours);
-    }, 60000);
+    }, 10000);
   }, []);
 
   const closeIsDeleting = () =>{

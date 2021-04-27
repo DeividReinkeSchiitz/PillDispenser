@@ -19,6 +19,7 @@ import ContextAllAlarmIsSelected from "../../context/ContextAllAlarmIsSelected";
 import ContextIsDeleting from "../../context/ContextIsDeleting";
 import useIsMount from "../../hooks/useIsMount";
 import {Colors} from "react-native/Libraries/NewAppScreen";
+import {put} from "../../controllers/alarmControllers";
 
 interface PropsI extends AlarmType{
   setListOfAlarmsToDelete:(newId:string, selectAllIds?:boolean)=>void
@@ -47,10 +48,7 @@ function AlarmInfo(props: PropsI) {
 
   const changeSwitchState = async () => {
     try {
-      api.put(`/alarms/${props.id}`, {
-        uid,
-        enabled: !switchState,
-      });
+      put(uid, props.id, !switchState);
     } catch (error) {
       console.log(error);
     }
@@ -97,7 +95,7 @@ function AlarmInfo(props: PropsI) {
 
             <View>
               <NameText>
-                {props.name.length > 28 ? props.name.slice(0, 26).concat("..."):props.name}
+                {props.name.length > 20 ? props.name.slice(0, 20).concat("..."):props.name}
               </NameText>
 
               {

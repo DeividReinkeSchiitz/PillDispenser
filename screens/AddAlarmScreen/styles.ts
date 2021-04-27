@@ -36,7 +36,7 @@ export const Label = styled.Text`
   margin-top:30px;
   margin-bottom:10px;
   color:black;
-  font-family:${Fonts.title};
+  font-family:${Fonts.subtitle};
 `;
 
 interface SubTitleProps {
