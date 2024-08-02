@@ -1,7 +1,7 @@
 import firebase from "firebase";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCuQEuzcNeMk-It2M8CjJHn5d7Yq9Ijd10",
+  apiKey: "KEY",
   authDomain: "pills-dispenser-613f5.firebaseapp.com",
   projectId: "pills-dispenser-613f5",
   storageBucket: "pills-dispenser-613f5.appspot.com",
